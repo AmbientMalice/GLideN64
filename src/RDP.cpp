@@ -583,8 +583,20 @@ void RDP_ProcessRDPList()
 			break;
 		}
 
-		if (RDP.cmd_cur + CmdLength[cmd] / 4 > MAXCMD)
-			::memcpy(RDP.cmd_data + MAXCMD, RDP.cmd_data, CmdLength[cmd] - (MAXCMD - RDP.cmd_cur) * 4);
+if (rdp_cmd_cur + rdp_command_length[cmd]/4 > MAXCMD) {
+        size_t copy_length;
+        const size_t limit = CMD_OVERFLOW_RESERVE * sizeof(rdp_cmd_data[0]);
+
+        copy_length = rdp_command_length[cmd] - 4*(MAXCMD - rdp_cmd_cur);
+                 if (copy_length > limit) {
+            fprintf(stderr,
+                "ERROR:  rdp_cmd_data[0x%X] overflow (%lu > %lu)\n",
+                MAXCMD, copy_length, limit
+            );
+            copy_length = limit;
+            }
+        ::memcpy(&rdp_cmd_data[MAXCMD], &rdp_cmd_data[0], copy_length);
+    }
 
 		// execute the command
 		u32 w0 = RDP.cmd_data[RDP.cmd_cur+0];
