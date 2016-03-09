@@ -1,8 +1,9 @@
 #ifndef RDP_H
 #define RDP_H
 
-#define MAXCMD 0x100000
-const unsigned int maxCMDMask = MAXCMD - 1;
+#define MAXCMD                  0x100000
+#define CMD_OVERFLOW_RESERVE    32
+static uint32_t rdp_cmd_data[MAXCMD + CMD_OVERFLOW_RESERVE];
 
 typedef struct
 {
